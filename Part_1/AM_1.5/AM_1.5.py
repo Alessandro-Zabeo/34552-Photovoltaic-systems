@@ -12,6 +12,7 @@ df = pd.read_excel (r'C:\Users\zabe1\Desktop\Photovoltaics Systems\3-Assignments
 print(df)
 '''PART1'''
 
+# Porco putana
 
 
 '''a) Global to perpendicular plane irradiance plot'''
