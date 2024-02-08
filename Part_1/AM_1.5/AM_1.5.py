@@ -12,7 +12,7 @@ df = pd.read_excel (r'C:\Users\mscuc\Documents\GitHub\34552-Photovoltaic-systems
 
 #print(df)
 
-# puto el nombre de las columnas en minusculas
+#df.plot()
 
 
 '''PART1'''
