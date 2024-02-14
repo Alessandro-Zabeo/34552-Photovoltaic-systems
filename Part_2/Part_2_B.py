@@ -97,14 +97,14 @@ fig, ax = plt.subplots()
 ax.plot(results_df.index, results_df['GPOA'], label='GPOA', color='black')
 ax.plot(results_df.index, results_df['Average DNI'], label='Average DNI', color='blue')
 ax.plot(results_df.index, results_df['Average DHI'], label='Average DHI', color='red')
-ax.plot(results_df.index, results_df['Average GHI'], label='Average GHI', color='green')
+# ax.plot(results_df.index, results_df['Average GHI'], label='Average GHI', color='green')
 
 # Set the x-ticks to be the original index labels
 ax.xaxis.set_major_locator(mdates.MonthLocator())
 ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
 
 # Set labels and title
-plt.xlabel('Time Stamp')
+plt.xlabel('Months')
 plt.ylabel('Irradiance')
 plt.title('Irradiance Values')
 plt.legend()
