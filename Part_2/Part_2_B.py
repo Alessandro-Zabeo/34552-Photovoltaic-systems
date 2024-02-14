@@ -23,21 +23,21 @@ class SolarCalculator:
         )
         return math.degrees(teta)
 
-    def calculate_beam_irradiance(self):
+    def calculate_beam_irradiance(self): #GB
         teta = self.calculate_teta()
         return self.DNI * math.cos(math.radians(teta))
 
-    def calculate_diffuse_irradiance(self):
+    def calculate_diffuse_irradiance(self): #GD
         return self.DHI * ((1 + math.cos(math.radians(self.beta))) / 2)
 
-    def ground_reflected_irradiance(self):
+    def ground_reflected_irradiance(self): #GR
         return self.GHI * self.rho * (1 - math.cos(math.radians(self.beta))) / 2
 
-# Assuming df is defined and has 'DNI', 'DHI', 'SolarElevation' and 'SolarAzimuth' columns
+
 df = pd.read_csv('2023_weather_data.csv', parse_dates=['TmStamp'], index_col='TmStamp')
 
-beta  = 0 # in degrees
-gamma = 0  # in degrees
+beta  = 0 #PV tilt in degrees
+gamma = 0  #PV azimuth in degrees
 rho = 0.2
 # Calculate the monthly averages of 'DNI', 'DHI', 'SolarElevation' and 'SolarAzimuth'
 monthly_averages = df.resample('M').mean()
@@ -54,9 +54,9 @@ for _, row in monthly_averages.iterrows():
     average_DNI = row['DNI']
     average_DHI = row['DHI']
     average_GHI = row['GHI']
-    alfa_s = row['SolarElevation']  # in degrees
-    gamma_s = row['SolarAzimuth']  # in degrees
-    teta_z = 90 - alfa_s  # in degrees
+    alfa_s = row['SolarElevation']  
+    gamma_s = row['SolarAzimuth']  
+    teta_z = 90 - alfa_s  
 
     # Create an instance of SolarCalculator
     calculator = SolarCalculator(beta, gamma, teta_z, alfa_s, gamma_s, average_DNI, average_DHI, average_GHI, rho)
@@ -85,8 +85,9 @@ results_df = pd.DataFrame({
     'Average DHI': average_DHI_values,
     'Average GHI': average_GHI_values
 })
-print(ground_reflected_irradiance_values)
-print(len(ground_reflected_irradiance_values))
+# print(ground_reflected_irradiance_values)
+# print(len(ground_reflected_irradiance_values))
+
 # Set TmStamp as the index
 results_df.set_index('TmStamp', inplace=True)
 
