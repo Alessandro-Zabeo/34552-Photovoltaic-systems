@@ -6,11 +6,11 @@ import matplotlib.dates as mdates
 
 class SolarCalculator:
     def __init__(self, beta, gamma, teta_z, alfa_s, gamma_s, DNI, DHI, GHI, rho):
-        self.beta = beta
-        self.gamma = gamma
-        self.teta_z = teta_z
-        self.alfa_s = alfa_s
-        self.gamma_s = gamma_s
+        self.beta = math.radians(beta)
+        self.gamma = math.radians(gamma)
+        self.teta_z = math.radians(teta_z)
+        self.alfa_s = math.radians(alfa_s)
+        self.gamma_s = math.radians(gamma_s)
         self.DNI = DNI
         self.DHI = DHI
         self.GHI = GHI
@@ -18,26 +18,28 @@ class SolarCalculator:
 
     def calculate_teta(self):  #Angle of incidence
         teta = math.acos(
-            math.cos(math.radians(self.beta)) * math.cos(math.radians(self.teta_z))
-            + math.sin(math.radians(self.beta)) * math.sin(math.radians(self.teta_z)) * math.cos(math.radians(self.gamma_s - self.gamma))
+            math.cos(self.beta) * math.cos(self.teta_z)
+            + math.sin(self.beta) * math.sin(self.teta_z) * math.cos(self.gamma_s - self.gamma)
         )
-        return math.degrees(teta)
+        return teta
 
     def calculate_beam_irradiance(self):
         teta = self.calculate_teta()
-        return self.DNI * math.cos(math.radians(teta))
+        return self.DNI * math.cos(teta)
 
     def calculate_diffuse_irradiance(self):
-        return self.DHI * ((1 + math.cos(math.radians(self.beta))) / 2)
+        return self.DHI * ((1 + math.cos(self.beta)) / 2)
 
     def ground_reflected_irradiance(self):
-        return self.GHI * self.rho * (1 - math.cos(math.radians(self.beta))) / 2
+        return self.GHI * self.rho * (1 - math.cos(self.beta)) / 2
 
 # Assuming df is defined and has 'DNI', 'DHI', 'SolarElevation' and 'SolarAzimuth' columns
 df = pd.read_csv('2023_weather_data.csv', parse_dates=['TmStamp'], index_col='TmStamp')
 
 beta  = 0 # in degrees
+beta_rad = math.radians(beta)
 gamma = 0  # in degrees
+gamma_rad = math.radians(gamma)
 rho = 0.2
 # Calculate the daily sums of 'DNI', 'DHI', 'SolarElevation' and 'SolarAzimuth'
 daily_sums = df.resample('D').sum()
@@ -56,9 +58,9 @@ for _, row in monthly_averages.iterrows():
     average_DNI = row['DNI']
     average_DHI = row['DHI']
     average_GHI = row['GHI']
-    alfa_s = row['SolarElevation']  # in degrees
-    gamma_s = row['SolarAzimuth']  # in degrees
-    teta_z = 90 - alfa_s  # in degrees
+    alfa_s = math.radians(row['SolarElevation'])  # in radians
+    gamma_s = math.radians(row['SolarAzimuth'])  # in radians
+    teta_z = math.radians(90 - row['SolarElevation'])  # in radians
 
     # Create an instance of SolarCalculator
     calculator = SolarCalculator(beta, gamma, teta_z, alfa_s, gamma_s, average_DNI, average_DHI, average_GHI, rho)
