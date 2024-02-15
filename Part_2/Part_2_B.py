@@ -23,24 +23,26 @@ class SolarCalculator:
         )
         return math.degrees(teta)
 
-    def calculate_beam_irradiance(self): #GB
+    def calculate_beam_irradiance(self):
         teta = self.calculate_teta()
         return self.DNI * math.cos(math.radians(teta))
 
-    def calculate_diffuse_irradiance(self): #GD
+    def calculate_diffuse_irradiance(self):
         return self.DHI * ((1 + math.cos(math.radians(self.beta))) / 2)
 
-    def ground_reflected_irradiance(self): #GR
+    def ground_reflected_irradiance(self):
         return self.GHI * self.rho * (1 - math.cos(math.radians(self.beta))) / 2
 
-
+# Assuming df is defined and has 'DNI', 'DHI', 'SolarElevation' and 'SolarAzimuth' columns
 df = pd.read_csv('2023_weather_data.csv', parse_dates=['TmStamp'], index_col='TmStamp')
 
-beta  = 0 #PV tilt in degrees
-gamma = 0  #PV azimuth in degrees
+beta  = 0 # in degrees
+gamma = 0  # in degrees
 rho = 0.2
-# Calculate the monthly averages of 'DNI', 'DHI', 'SolarElevation' and 'SolarAzimuth'
-monthly_averages = df.resample('M').mean()
+# Calculate the daily sums of 'DNI', 'DHI', 'SolarElevation' and 'SolarAzimuth'
+daily_sums = df.resample('D').sum()
+# Calculate the monthly averages of the daily sums
+monthly_averages = daily_sums.resample('M').mean()
 
 beam_irradiance_values = []
 diffuse_irradiance_values = []
@@ -54,9 +56,9 @@ for _, row in monthly_averages.iterrows():
     average_DNI = row['DNI']
     average_DHI = row['DHI']
     average_GHI = row['GHI']
-    alfa_s = row['SolarElevation']  
-    gamma_s = row['SolarAzimuth']  
-    teta_z = 90 - alfa_s  
+    alfa_s = row['SolarElevation']  # in degrees
+    gamma_s = row['SolarAzimuth']  # in degrees
+    teta_z = 90 - alfa_s  # in degrees
 
     # Create an instance of SolarCalculator
     calculator = SolarCalculator(beta, gamma, teta_z, alfa_s, gamma_s, average_DNI, average_DHI, average_GHI, rho)
@@ -85,29 +87,25 @@ results_df = pd.DataFrame({
     'Average DHI': average_DHI_values,
     'Average GHI': average_GHI_values
 })
-# print(ground_reflected_irradiance_values)
-# print(len(ground_reflected_irradiance_values))
 
 # Set TmStamp as the index
 results_df.set_index('TmStamp', inplace=True)
 
 # Create a figure and axis
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(14,9))
 
 # Plot each set of y-values
 ax.plot(results_df.index, results_df['GPOA'], label='GPOA', color='black')
 ax.plot(results_df.index, results_df['Average DNI'], label='Average DNI', color='blue')
 ax.plot(results_df.index, results_df['Average DHI'], label='Average DHI', color='red')
-# ax.plot(results_df.index, results_df['Average GHI'], label='Average GHI', color='green')
+ax.plot(results_df.index, results_df['Average GHI'], label='Average GHI', color='green')
 
 # Set the x-ticks to be the original index labels
 ax.xaxis.set_major_locator(mdates.MonthLocator())
-ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+ax.xaxis.set_major_formatter(mdates.DateFormatter('%B'))  # Display full month name
 
-# Set labels and title
-plt.xlabel('Months')
-plt.ylabel('Irradiance')
-plt.title('Irradiance Values')
-plt.legend()
+# Add a legend
+ax.legend()
 
+# Show the plot
 plt.show()
