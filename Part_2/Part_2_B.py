@@ -42,7 +42,7 @@ rho = 0.2
 # Calculate the daily sums of 'DNI', 'DHI', 'SolarElevation' and 'SolarAzimuth'
 daily_sums = df.resample('D').sum()
 # Calculate the monthly averages of the daily sums
-monthly_averages = daily_sums.resample('M').mean()
+monthly_averages = daily_sums.resample('MS').mean()
 
 beam_irradiance_values = []
 diffuse_irradiance_values = []
