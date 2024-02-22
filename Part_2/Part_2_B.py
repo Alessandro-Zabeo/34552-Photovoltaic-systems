@@ -226,3 +226,4 @@ ax.set_title('Global Plane of Array Irradiance for Specified Beta and Gamma Valu
 
 # Show the plot
 plt.show()
+
