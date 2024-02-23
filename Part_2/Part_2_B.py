@@ -348,19 +348,22 @@ plt.legend()
 plt.show()
 
 # Plot monthly averages of G_DPOA
-plt.figure(figsize=(10, 6))
-for column in monthly_avg_GDPOA.columns:
-    plt.plot(monthly_avg_GDPOA.index, monthly_avg_GDPOA[column], label=column)
-plt.title('Monthly Averages of G_DPOA')
-plt.xlabel('Month')
-plt.ylabel('Average Value')
-plt.legend()
-plt.show()
+# plt.figure(figsize=(10, 6))
+# for column in monthly_avg_GDPOA.columns:
+#     plt.plot(monthly_avg_GDPOA.index, monthly_avg_GDPOA[column], label=column)
+# plt.title('Monthly Averages of G_DPOA')
+# plt.xlabel('Month')
+# plt.ylabel('Average Value')
+# plt.legend()
+# plt.show()
 
 # Plot daily averages of G_DPOA
 plt.figure(figsize=(10, 6))
 for column in daily_GDPOA.columns:
-    plt.plot(daily_GDPOA.index, daily_GDPOA[column], label=column)
+    if column == 'West':
+        plt.plot(daily_GDPOA.index, daily_GDPOA[column], label=column, linestyle='dashed')
+    else:
+        plt.plot(daily_GDPOA.index, daily_GDPOA[column], label=column)
 plt.title('Daily Averages of G_DPOA')
 plt.xlabel('Date')
 plt.ylabel('Average Value')
