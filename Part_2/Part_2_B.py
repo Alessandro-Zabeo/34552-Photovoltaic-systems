@@ -276,6 +276,7 @@ angles['SolarZenith'] = 90 - data['SolarElevation'] # Theta_Z in degrees
 angles['SolarAzimuth'] = data['SolarAzimuth'] # Gamma_Z in degrees
 
 G_POA = pd.DataFrame()
+G_DPOA_df = pd.DataFrame()
 
 # Calculate AOI (theta) and G_POA contributions
 for i in range(4):
@@ -313,18 +314,24 @@ for i in range(4):
         G_POA_values.append(G_BPOA + G_DPOA + G_RPOA)
 
     G_POA[PV_orientation[i]] = G_POA_values
+    G_DPOA_df[PV_orientation[i]] = G_DPOA_values
 
 G_POA['date'] = data['TmStamp'].dt.date
+G_DPOA_df['date'] = data['TmStamp'].dt.date
 
 daily_GPOA = G_POA.groupby('date').sum()
 daily_GPOA.index = pd.to_datetime(daily_GPOA.index)
 monthly_avg = daily_GPOA.resample('M').sum() / daily_GPOA.resample('M').count()
 
+daily_GDPOA = G_DPOA_df.groupby('date').sum()
+daily_GDPOA.index = pd.to_datetime(daily_GDPOA.index)
+monthly_avg_GDPOA = daily_GDPOA.resample('M').sum() / daily_GDPOA.resample('M').count()
+
 # Plot monthly averages
 plt.figure(figsize=(10, 6))
 for column in monthly_avg.columns:
     plt.plot(monthly_avg.index, monthly_avg[column], label=column)
-plt.title('Monthly Averages')
+plt.title('Monthly Averages of G_POA')
 plt.xlabel('Month')
 plt.ylabel('Average Value')
 plt.legend()
@@ -334,7 +341,27 @@ plt.show()
 plt.figure(figsize=(10, 6))
 for column in daily_GPOA.columns:
     plt.plot(daily_GPOA.index, daily_GPOA[column], label=column)
-plt.title('Daily Averages')
+plt.title('Daily Averages of G_POA')
+plt.xlabel('Date')
+plt.ylabel('Average Value')
+plt.legend()
+plt.show()
+
+# Plot monthly averages of G_DPOA
+plt.figure(figsize=(10, 6))
+for column in monthly_avg_GDPOA.columns:
+    plt.plot(monthly_avg_GDPOA.index, monthly_avg_GDPOA[column], label=column)
+plt.title('Monthly Averages of G_DPOA')
+plt.xlabel('Month')
+plt.ylabel('Average Value')
+plt.legend()
+plt.show()
+
+# Plot daily averages of G_DPOA
+plt.figure(figsize=(10, 6))
+for column in daily_GDPOA.columns:
+    plt.plot(daily_GDPOA.index, daily_GDPOA[column], label=column)
+plt.title('Daily Averages of G_DPOA')
 plt.xlabel('Date')
 plt.ylabel('Average Value')
 plt.legend()
