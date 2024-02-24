@@ -21,7 +21,7 @@ df = pd.read_excel ('AM 1.5.xlsx',
 '''a) Global to perpendicular plane irradiance plot'''
 
 
-df['Global to perpendicular plane  (W/m2/nm)'].plot()
+#df['Global to perpendicular plane  (W/m2/nm)'].plot()
 
 
 '''b)Calculate the total integrated (broadband) irradiance of the Global to perpendicular plane irradiance'''
@@ -42,7 +42,15 @@ print(f"the peak wavelength is {peak_wavelength}")
 
 '''PART2'''
 
-df.plot()
+#plot 'Global to horizontal plane  (W/m2/nm)','Direct to horizontal plane (W/m2/nm)','Diffuse to horizontal plane (W/m2/nm)' in the same graph
+df['Global to horizontal plane  (W/m2/nm)'].plot(label='Global')
+df['Direct to horizontal plane (W/m2/nm)'].plot(label='Direct')
+df['Diffuse to horizontal plane (W/m2/nm)'].plot(label='Diffuse')
+
+pyplot.legend()
+pyplot.xlabel('Wavelength (nm)')
+pyplot.ylabel('Spectral horizontal irradiance (W/m2/nm)')
+pyplot.title('AM1.5')
 
 '''a'''
 global_to_horizontal = np.trapz(df['Global to horizontal plane  (W/m2/nm)'], df.index)
