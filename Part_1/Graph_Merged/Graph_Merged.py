@@ -33,8 +33,13 @@ df_6 = pd.read_excel ('..\AM_6\AM 6.0.xlsx',
                   )
 
 
-df_15['Global to perpendicular plane  (W/m2/nm)'].plot()
-df_3['Global to perpendicular plane  (W/m2/nm)'].plot()
-df_45['Global to perpendicular plane  (W/m2/nm)'].plot()
-df_6['Global to perpendicular plane  (W/m2/nm)'].plot()
+df_15['Global to perpendicular plane  (W/m2/nm)'].plot(label='AM 1.5')
+df_3['Global to perpendicular plane  (W/m2/nm)'].plot(label='AM 3.0')
+df_45['Global to perpendicular plane  (W/m2/nm)'].plot(label='AM 4.5')
+df_6['Global to perpendicular plane  (W/m2/nm)'].plot(label='AM 6.0')
 
+plt.legend()
+
+plt.xlabel('Wavelength (nm)')
+plt.ylabel('Spectral Irradiance (W/m2/nm)')
+plt.title('Global to perpendicular plane')
