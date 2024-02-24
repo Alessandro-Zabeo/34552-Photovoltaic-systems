@@ -140,3 +140,66 @@ plt.ylabel('Average Value')
 plt.legend()
 plt.show()
 
+
+#Annual Energy 
+# Calculate annual energy for each PV orientation
+annual_energy = {}
+for orientation in PV_orientation:
+    annual_energy[orientation] = monthly_avg[orientation].sum()
+
+# Print the annual energy for each PV orientation
+for orientation, energy in annual_energy.items():
+    print(f'Orientation: {orientation} - Annual Energy: {energy} kWh')
+
+# Calculate G_BPOA, G_DPOA, and G_RPOA contributions
+G_BPOA_df = pd.DataFrame()
+G_RPOA_df = pd.DataFrame()
+
+for i in range(4):
+    beta = PV_tilt[i]
+    gamma = PV_azimuth[i]
+    G_BPOA_values = []
+    G_RPOA_values = []
+
+    for _, row in data.iterrows():
+        teta_z = math.radians(90 - row['SolarElevation'])  # Theta_Z in radians
+        alfa_s = math.radians(row['SolarAzimuth'])  # Alfa_S in radians
+        gamma_s = math.radians(row['SolarAzimuth'])  # Gamma_S in radians
+        DNI = row['DNI_calc']
+        DHI = row['DHI']
+        GHI = row['GHI']
+
+        # Create an instance of SolarCalculator
+        calculator = SolarCalculator(beta, gamma, teta_z, alfa_s, gamma_s, DNI, DHI, GHI, rho)
+
+        aoi = calculator.calculate_aoi()
+
+        G_BPOA = calculator.calculate_beam_irradiance(aoi)
+        G_BPOA_values.append(G_BPOA)
+
+        G_RPOA = calculator.calculate_ground_reflected_irradiance()
+        G_RPOA_values.append(G_RPOA)
+
+    G_BPOA_df[PV_orientation[i]] = G_BPOA_values
+    G_RPOA_df[PV_orientation[i]] = G_RPOA_values
+
+G_BPOA_df['date'] = data['TmStamp'].dt.date
+G_RPOA_df['date'] = data['TmStamp'].dt.date
+
+daily_G_BPOA = G_BPOA_df.groupby('date').sum()
+daily_G_RPOA = G_RPOA_df.groupby('date').sum()
+
+# Calculate annual energy for each PV orientation
+annual_G_BPOA = {}
+annual_G_DPOA = G_DPOA_df.groupby('date').sum().sum()
+annual_G_RPOA = {}
+
+for orientation in PV_orientation:
+    annual_G_BPOA[orientation] = daily_G_BPOA[orientation].sum()
+    annual_G_RPOA[orientation] = daily_G_RPOA[orientation].sum()
+
+# Print the annual energy for each PV orientation
+for orientation in PV_orientation:
+    print(f'Orientation: {orientation} - Annual G_BPOA: {annual_G_BPOA[orientation]} kWh')
+    print(f'Orientation: {orientation} - Annual G_DPOA: {annual_G_DPOA[orientation]} kWh')
+    print(f'Orientation: {orientation} - Annual G_RPOA: {annual_G_RPOA[orientation]} kWh')
