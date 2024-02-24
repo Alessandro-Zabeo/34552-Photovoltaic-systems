@@ -35,3 +35,4 @@ print(f"Beam irradiance: {Beam_irradiance:.2f}")  # Print teta with 2 decimal pl
 
 Diffuse_irradiance = DHI * ((1+math.cos(beta_rad))/2)
 print(f"Diffuse irradiance: {Diffuse_irradiance:.2f}")  # Print teta with 2 decimal places
+
