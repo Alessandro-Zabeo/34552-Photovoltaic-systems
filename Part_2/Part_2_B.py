@@ -139,3 +139,4 @@ plt.xlabel('Date')
 plt.ylabel('Average Value')
 plt.legend()
 plt.show()
+
