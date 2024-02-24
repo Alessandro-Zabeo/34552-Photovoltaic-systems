@@ -1,7 +1,7 @@
-import pandas as pd
+# import pandas as pd
 
-df = pd.read_csv(r'C:\Users\zabe1\Desktop\Photovoltaics Systems\3-Assignments\34552-Photovoltaic-systems\Part_2\2023_weather_data.csv',
-                 usecols=['TmStamp', 'Day_of_year', 'DNI', 'DHI', 'GHI', 'SolarElevation', 'SolarAzimuth', ],
-                 index_col='TmStamp',)
+# df = pd.read_csv(r'C:\Users\zabe1\Desktop\Photovoltaics Systems\3-Assignments\34552-Photovoltaic-systems\Part_2\2023_weather_data.csv',
+#                  usecols=['TmStamp', 'Day_of_year', 'DNI', 'DHI', 'GHI', 'SolarElevation', 'SolarAzimuth', ],
+#                  index_col='TmStamp',)
 
-print(df)
+# print(df)
