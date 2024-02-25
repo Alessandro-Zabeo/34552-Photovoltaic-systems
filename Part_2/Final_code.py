@@ -1,35 +1,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import math
-
-class SolarCalculator:
-    def __init__(self, beta, gamma, teta_z, alfa_s, gamma_s, DNI, DHI, GHI, rho):
-        self.beta = beta
-        self.gamma = gamma
-        self.teta_z = teta_z
-        self.alfa_s = alfa_s
-        self.gamma_s = gamma_s
-        self.DNI = DNI
-        self.DHI = DHI
-        self.GHI = GHI
-        self.rho = rho
-
-    def calculate_aoi(self):
-        aoi = (np.cos(self.beta) * np.cos(self.teta_z)) + (np.sin(self.beta) * np.sin(self.teta_z) * np.cos(self.gamma_s - self.gamma))
-        return aoi
-
-    def calculate_beam_irradiance(self, aoi):
-        if math.degrees(math.acos(aoi)) > 90:
-            return 0
-        else:
-            return self.DNI * aoi
-
-    def calculate_diffuse_irradiance(self):
-        return self.DHI * (1 + np.cos(self.beta))/2
-
-    def calculate_ground_reflected_irradiance(self):
-        return self.GHI * self.rho * (1 - np.cos(self.beta))/2
 
 # Load data and initialise relevant values
 data = pd.read_csv("2023_weather_data.csv")
@@ -52,33 +23,25 @@ G_DPOA_df = pd.DataFrame()
 for i in range(4):
     beta = PV_tilt[i]
     gamma = PV_azimuth[i]
-    aoi_values = []
     G_BPOA_values = []
     G_DPOA_values = []
     G_RPOA_values = []
     G_POA_values = []
 
-    for _, row in data.iterrows():
-        teta_z = math.radians(90 - row['SolarElevation'])  # Theta_Z in radians
-        alfa_s = math.radians(row['SolarAzimuth'])  # Alfa_S in radians
-        gamma_s = math.radians(row['SolarAzimuth'])  # Gamma_S in radians
-        DNI = row['DNI_calc']
-        DHI = row['DHI']
-        GHI = row['GHI']
+    AOI = (np.cos(beta) * np.cos(angles['SolarZenith']*np.pi/180)) + (np.sin(beta) * np.sin(angles['SolarZenith']*np.pi/180) * np.cos((angles['SolarAzimuth']-gamma)*np.pi/180))
+    AOI_degree = np.arccos(AOI) * (180/np.pi)
 
-        # Create an instance of SolarCalculator
-        calculator = SolarCalculator(beta, gamma, teta_z, alfa_s, gamma_s, DNI, DHI, GHI, rho)
-
-        aoi = calculator.calculate_aoi()
-        aoi_values.append(aoi)
-
-        G_BPOA = calculator.calculate_beam_irradiance(aoi)
+    for idx in AOI_degree.index:
+        if AOI_degree.at[idx] > 90:
+            G_BPOA = 0
+        else: 
+            G_BPOA = data.at[idx, 'DNI_calc'] * AOI.at[idx] # Direct beam irradiance
         G_BPOA_values.append(G_BPOA)
 
-        G_DPOA = calculator.calculate_diffuse_irradiance()
+        G_DPOA = data.at[idx, 'DHI'] * (1 + np.cos(beta))/2 # Diffuse irradiance
         G_DPOA_values.append(G_DPOA)
 
-        G_RPOA = calculator.calculate_ground_reflected_irradiance()
+        G_RPOA = data.at[idx, 'GHI'] * rho * (1 - np.cos(beta))/2 # Ground reflected irradiance
         G_RPOA_values.append(G_RPOA)
 
         G_POA_values.append(G_BPOA + G_DPOA + G_RPOA)
@@ -117,16 +80,6 @@ plt.ylabel('Average Value')
 plt.legend()
 plt.show()
 
-# Plot monthly averages of G_DPOA
-# plt.figure(figsize=(10, 6))
-# for column in monthly_avg_GDPOA.columns:
-#     plt.plot(monthly_avg_GDPOA.index, monthly_avg_GDPOA[column], label=column)
-# plt.title('Monthly Averages of G_DPOA')
-# plt.xlabel('Month')
-# plt.ylabel('Average Value')
-# plt.legend()
-# plt.show()
-
 # Plot daily averages of G_DPOA
 plt.figure(figsize=(10, 6))
 for column in daily_GDPOA.columns:
@@ -139,7 +92,6 @@ plt.xlabel('Date')
 plt.ylabel('Average Value')
 plt.legend()
 plt.show()
-
 
 # Calculate annual energy for each PV orientation
 annual_energy = {}
@@ -158,25 +110,3 @@ for orientation in PV_orientation:
 # Print the annual energy ratio for each PV orientation
 for orientation, energy_ratio in annual_energy_ratio.items():
     print(f'Orientation: {orientation} - Annual Energy Ratio: {energy_ratio}')
-
-# # Calculate annual energy for each PV orientation
-# annual_G_BPOA = {}
-# annual_G_DPOA = {}
-# annual_G_RPOA = {}
-# annual_G_POA = {}
-
-# for orientation in PV_orientation:
-#     annual_G_BPOA[orientation] = G_BPOA_df.groupby('date').sum()[orientation].sum()
-#     annual_G_DPOA[orientation] = G_DPOA_df.groupby('date').sum()[orientation].sum()
-#     annual_G_RPOA[orientation] = G_RPOA_df.groupby('date').sum()[orientation].sum()
-#     annual_G_POA[orientation] = G_POA.groupby('date').sum()[orientation].sum()
-
-# # Print the annual energy for each PV orientation
-# for orientation in PV_orientation:
-#     print(f'Orientation: {orientation} - Annual G_BPOA: {annual_G_BPOA[orientation]} kWh')
-#     print(f'Orientation: {orientation} - Annual G_DPOA: {annual_G_DPOA[orientation]} kWh')
-#     print(f'Orientation: {orientation} - Annual G_RPOA: {annual_G_RPOA[orientation]} kWh')
-#     print(f'Orientation: {orientation} - Annual G_POA: {annual_G_POA[orientation]} kWh')
-
-
-#Yearly transposition fasctor
