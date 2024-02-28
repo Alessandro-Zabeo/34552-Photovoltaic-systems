@@ -155,7 +155,7 @@ monthly_GRPOA = G_RPOA_df.groupby(G_RPOA_df['date'].dt.to_period('M')).mean()
 
 # Plot monthly averages for G_BPOA, G_DPOA, G_RPOA, and G_POA for each PV angle configuration
 for i in range(4):
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(16, 9))
     plt.plot(monthly_GPOA.index.strftime('%Y-%m'), monthly_GPOA[PV_orientation[i]], label=f'G_POA {PV_orientation[i]}')
     plt.plot(monthly_GBPOA.index.strftime('%Y-%m'), monthly_GBPOA[PV_orientation[i]], label=f'G_BPOA {PV_orientation[i]}', linestyle='dashed')
     plt.plot(monthly_GDPOA.index.strftime('%Y-%m'), monthly_GDPOA[PV_orientation[i]], label=f'G_DPOA {PV_orientation[i]}', linestyle='dotted')
