@@ -1,14 +1,7 @@
-# import pandas as pd
-
-# df = pd.read_csv(r'C:\Users\zabe1\Desktop\Photovoltaics Systems\3-Assignments\34552-Photovoltaic-systems\Part_2\2023_weather_data.csv',
-#                  usecols=['TmStamp', 'Day_of_year', 'DNI', 'DHI', 'GHI', 'SolarElevation', 'SolarAzimuth', ],
-#                  index_col='TmStamp',)
-
-# print(df)
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import calendar
 
 # Load data and initialise relevant values
 data = pd.read_csv("2023_weather_data.csv")
@@ -118,3 +111,27 @@ for orientation in PV_orientation:
 # Print the annual energy ratio for each PV orientation
 for orientation, energy_ratio in annual_energy_ratio.items():
     print(f'Orientation: {orientation} - Annual Energy Ratio: {energy_ratio}')
+
+# Define months as a dictionary with corresponding days
+months = {
+    'Jan': 31, 'Feb': 28, 'Mar': 31, 'Apr': 30, 'May': 31, 'Jun': 30,
+    'Jul': 31, 'Aug': 31, 'Sep': 30, 'Oct': 31, 'Nov': 30, 'Dec': 31
+    }
+
+
+# Loop through orientations (columns)
+for orientation, col in monthly_avg.items():
+  # Loop through months (rows)
+  for month_name in monthly_avg.index:
+    # Convert month_name to string format 'Jan', 'Feb', etc.
+    month_str = month_name.strftime('%b')
+    # Multiply by number of days for that month
+    monthly_avg.loc[month_name, orientation] = col[month_name] * months[month_str]
+# Extract column names as a list
+column_names = list(monthly_avg.columns)
+
+# Calculate sum for each column using list comprehension
+Annual_energy = [monthly_avg[col].sum() for col in column_names]
+
+# Print the column sums
+print(f'Annual energy: {Annual_energy}')
